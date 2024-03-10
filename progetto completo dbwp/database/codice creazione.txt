@@ -1,0 +1,165 @@
+create table UTENTE(
+NomeUtente varchar(20) primary key,
+Email varchar(30) unique not null,
+Password varchar(20) not null
+);
+
+create table ARTISTA(
+ID_Artista int primary key auto_increment,
+Nome varchar(30) not null,
+Nazione varchar(20) not null,
+DataNascita year not null,
+DataMorte year
+);
+
+create table GRUPPO(
+ID_Gruppo int primary key auto_increment,
+Nome varchar(30) not null,
+Nazione varchar(20) not null,
+Inizio_attivita year not null,
+Fine_attivita year
+);
+
+create table THREAD(
+ID_Thread int primary key auto_increment,
+Intestazione varchar(50) not null,
+Corpo varchar(400) not null,
+FK_Utente varchar(20) not null,
+CONSTRAINT FK3 foreign key (FK_Utente) references UTENTE(NomeUtente)
+ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+create table COMMENTO(
+ID_Commento int primary key auto_increment,
+Corpo varchar(400) not null,
+FK_Thread int not null,
+CONSTRAINT FK4 foreign key (FK_Thread) references THREAD(ID_Thread)
+ON DELETE CASCADE,
+FK_Utente varchar(20) not null,
+CONSTRAINT FK5 foreign key (FK_Utente) references UTENTE(NomeUtente)
+ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+create table ALBUM_GRUPPO(
+ID_Album int primary key auto_increment,
+Nome varchar(100) not null,
+Lingua varchar(20) not null,
+Data year not null,
+codiceG int not null,
+CONSTRAINT FK1 foreign key (codiceG) references GRUPPO(ID_GRUPPO)
+ON DELETE NO ACTION,
+Durata time not null
+);
+
+create table ALBUM_ARTISTA(
+ID_Album int primary key auto_increment,
+Nome varchar(100) not null,
+Lingua varchar(20) not null,
+Data year not null,
+codiceA int not null,
+CONSTRAINT FK2 foreign key (codiceA) references ARTISTA(ID_Artista)
+ON DELETE NO ACTION,
+Durata time not null
+);
+
+create table CANZONE_ARTISTA(
+ID_Canzone int primary key auto_increment,
+Ntracklist int not null check (Ntracklist>=0) ,
+Nome varchar(100) not null,
+FK_ALBUMARTISTA int not null,
+CONSTRAINT FK6 foreign key (FK_ALBUMARTISTA) references ALBUM_ARTISTA(ID_ALBUM)
+ON DELETE NO ACTION
+);
+
+create table CANZONE_GRUPPO(
+ID_Canzone int primary key auto_increment,
+Ntracklist int not null check (Ntracklist>=0),
+Nome varchar(100) not null,
+FK_ALBUMGRUPPO int not null,
+CONSTRAINT FK7 foreign key (FK_ALBUMGRUPPO) references ALBUM_GRUPPO(ID_ALBUM)
+ON DELETE NO ACTION
+);
+
+create table GENERE(
+ID_Genere int primary key auto_increment,
+Nome varchar(20) not null,
+Descrizione varchar(2000) not null
+);
+
+create table RECENSIONE_AR(
+ID_RECENSIONE int auto_increment primary key,
+FK_Utente varchar(20) not null,
+CONSTRAINT FK8 foreign key (FK_Utente) references UTENTE(NomeUtente)
+ON DELETE CASCADE ON UPDATE CASCADE,
+FK_Album_AR int not null,
+CONSTRAINT FK9 foreign key (FK_Album_AR) references ALBUM_ARTISTA(ID_Album)
+ON DELETE NO ACTION,
+Intestazione varchar(50),
+Corpo varchar(400),
+voto int not null check (voto>=0 AND voto<=9),
+CONSTRAINT Rec_UNICA UNIQUE (FK_Utente,FK_Album_AR)
+);
+
+create table RECENSIONE_GR(
+ID_RECENSIONE int auto_increment primary key,
+FK_Utente varchar(20) not null,
+CONSTRAINT FK10 foreign key (FK_Utente) references UTENTE(NomeUtente)
+ON DELETE CASCADE ON UPDATE CASCADE,
+FK_Album_GR int not null,
+CONSTRAINT FK11 foreign key (FK_Album_GR) references ALBUM_GRUPPO(ID_Album)
+ON DELETE NO ACTION,
+Intestazione varchar(50),
+Corpo varchar(400),
+voto int not null check (voto>=0 AND voto<=9),
+CONSTRAINT Rec_UNICA UNIQUE (FK_Utente,FK_Album_GR)
+);
+
+create table DESCRIZIONE_G(
+FK_GENERE int not null,
+CONSTRAINT FK12 foreign key (FK_Genere) references GENERE(ID_GENERE)
+ON DELETE NO ACTION,
+FK_GRUPPO int not null,
+CONSTRAINT FK13 foreign key (FK_Gruppo) references GRUPPO(ID_GRUPPO)
+ON DELETE NO ACTION,
+CONSTRAINT PKUN primary key (FK_GRUPPO,FK_GENERE)
+);
+
+create table DESCRIZIONE_AR(
+FK_GENERE int not null,
+CONSTRAINT FK14 foreign key (FK_Genere) references GENERE(ID_GENERE)
+ON DELETE NO ACTION,
+FK_ARTISTA int not null,
+CONSTRAINT FK15 foreign key (FK_Artista) references ARTISTA(ID_ARTISTA)
+ON DELETE NO ACTION,
+CONSTRAINT PKUN primary key (FK_GENERE,FK_ARTISTA)
+);
+
+create table DESCRIZIONE_AL_AR(
+FK_GENERE int not null,
+CONSTRAINT FK16 foreign key (FK_Genere) references GENERE(ID_GENERE)
+ON DELETE NO ACTION,
+FK_ALBUM int not null,
+CONSTRAINT FK17 foreign key (FK_ALBUM) references ALBUM_ARTISTA(ID_ALBUM)
+ON DELETE NO ACTION,
+CONSTRAINT PKUN primary key (FK_GENERE,FK_ALBUM)
+);
+
+create table DESCRIZIONE_AL_GR(
+FK_GENERE int not null,
+CONSTRAINT FK18 foreign key (FK_Genere) references GENERE(ID_GENERE)
+ON DELETE NO ACTION,
+FK_ALBUM int not null,
+CONSTRAINT FK19 foreign key (FK_Album) references ALBUM_GRUPPO(ID_ALBUM)
+ON DELETE NO ACTION,
+CONSTRAINT PKUN primary key (FK_GENERE,FK_ALBUM)
+);
+
+create table FORMAZIONE(
+FK_ARTISTA int not null,
+CONSTRAINT FK20 foreign key (FK_Artista) references ARTISTA(ID_ARTISTA)
+ON DELETE NO ACTION,
+FK_GRUPPO int not null,
+CONSTRAINT FK21 foreign key (FK_Gruppo) references GRUPPO(ID_GRUPPO)
+ON DELETE NO ACTION,
+CONSTRAINT PKUN primary key (FK_GRUPPO,FK_ARTISTA)
+);
